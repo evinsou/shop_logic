@@ -1,55 +1,40 @@
 module Shop
 	class Rule
 
-		def initialize(product_name, paid_amount, free_amount, new_price = nil)
-			@product_name = product_name
+    attr_reader :new_price,
+                :action_product,
+                :paid_amount,
+                :free_amount
+
+		def initialize(action_product, paid_amount = 1, free_amount = 0, new_price = nil)
+			@action_product = action_product
       @paid_amount = paid_amount
       @free_amount = free_amount
       @new_price = new_price
 		end
 
-    def formula(number, product_price)
-      return number * product_price if self.free_amount == 0 # WTF?
-
-      (number / action_amount + number % action_amount) * product_price
+    def applies?(item)
+      action_product == item.name && action_amount <= item.amount
     end
 
-    def applies?(name , number)
-      self.product_name == name && self.action_amount <= number
+    def formula(product)
+      number = product.amount
+      product_price = new_price || product.price
+
+      num_mult = (number / action_amount + number % action_amount)
+      num_mult = number if free_amount == 0
+
+      common_formula(num_mult, product_price)
     end
 
-    def new_price
-      @new_price
-    end
-
-    def product_name
-      @product_name
-    end
+    private
 
     def action_amount
       paid_amount + free_amount
     end
 
-    def paid_amount
-      @paid_amount
-    end
-
-    def free_amount
-      @free_amount
+    def common_formula(coefficient, price)
+      coefficient * price
     end
 	end
 end
-  
-module Shop
-  class DefaultRule < Rule
-
-    def applies?(name , number)
-      true
-    end
-
-    def formula(number, product_price)
-      number * product_price
-    end
-  end
-end
-
