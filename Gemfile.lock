@@ -23,6 +23,3 @@ PLATFORMS
 DEPENDENCIES
   byebug
   rspec
-
-BUNDLED WITH
-   1.11.2
